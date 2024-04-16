@@ -1,5 +1,5 @@
 Use the table in the <a href="https://github.com/alex-pallan/CPRE288-Final-Project/projects" target="_self">projects</a> tab to organize your work.
-<br /><a href="https://alex-pallan.github.io/cpre288-quick-reference/register-tables.html" target="_blank">Quick reference website</a>
+<br /><br /><a href="https://alex-pallan.github.io/cpre288-quick-reference/register-tables.html" target="_blank">Quick reference website</a>
 # Mission
 TBD
 # Team Contract

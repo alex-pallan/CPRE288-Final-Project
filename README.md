@@ -1,5 +1,7 @@
 <span style="color: red;">Use the table in the <a href="https://github.com/alex-pallan/CPRE288-Final-Project/projects" target="_self">projects</a> tab to organize your work</span>
-# CPRE288-Final-Project
+# Mission
+TBD
+# Team Contract
 ## Goals
 We want to have the CyBot navigate the test field with minimal mistakes.
 We want to have effective teamwork and communicate efficiently.

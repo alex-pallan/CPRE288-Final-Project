@@ -9,4 +9,4 @@
 2. Click `CPRE288 Final Project`
 3. You are greeted with a table with a variety of issues, create, move, and add comments to the issues as you work so we can stay organized
 
-<a href="https://alex-pallan.github.io/cpre288-quick-reference/" target="_blank">Quick reference website</a>
+<div style="width: 100%; text-align: center"><a href="https://alex-pallan.github.io/cpre288-quick-reference/" target="_blank">Quick reference website</a></div>

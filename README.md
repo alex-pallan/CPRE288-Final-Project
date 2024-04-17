@@ -1,4 +1,4 @@
-↓ Written by Alex, please read ↓
+↓ **Written by Alex, please read** ↓
 
 # To work on this project:
 1. Downlaod the `CprE288FinalProjectWorkspace` folder from this github

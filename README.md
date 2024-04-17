@@ -1,3 +1,5 @@
+\/ Written by Alex, please read \/
+
 # To work on this project:
 1. Downlaod the `CprE288FinalProjectWorkspace` folder from this github
 2. On a lab computer, launch Code Composer Studio

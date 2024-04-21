@@ -11,4 +11,12 @@
 2. Click `CPRE288 Final Project`
 3. You are greeted with a table with a variety of issues, create, move, and add comments to the issues as you work so we can stay organized
 
+# Parts of this project
+There are several parts of this project that can be broken up into more manageable chunks.
+1. The Python/PuTTY GUI
+2. The sending and reception of commands to the bot
+3. The collection of data (Scanning)
+4. Producing actions out of the bot (actually moving, potentially making sound)
+Each person should work on their part of the project, so we can be prepared for demonstration.
+
 <div style="width: 100%; text-align: center"><a href="https://alex-pallan.github.io/cpre288-quick-reference/" target="_blank">Quick reference website</a></div>

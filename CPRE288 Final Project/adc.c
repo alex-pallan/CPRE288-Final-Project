@@ -42,6 +42,16 @@ uint32_t adc_read_avg(void){
     return avgVal;
 }
 
+float adc_distance(void){
+    uint32_t adcVal = adc_read_avg();
+    float dist = 659794 * (powf(adcVal, -1.42));
+    char buffer[20];
+    sprintf(buffer, "%d, %.2f", adcVal, dist);
+    lcd_puts(buffer);
+    timer_waitMillis(1500);
+    return dist;
+}
+
 
 
 

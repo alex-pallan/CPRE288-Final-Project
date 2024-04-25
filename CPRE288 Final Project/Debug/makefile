@@ -10,8 +10,23 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./Timer.obj" \
+"./adc.obj" \
+"./button.obj" \
+"./helloworld.obj" \
+"./lab5_template.obj" \
+"./lcd.obj" \
+"./lcd_rotatingBanner.obj" \
 "./main.obj" \
+"./movement.obj" \
+"./open_interface.obj" \
+"./ping_template.obj" \
+"./servo.obj" \
 "./tm4c123gh6pm_startup_ccs.obj" \
+"./uart-interrupt.obj" \
+"./uart.obj" \
+"../libcybotScan.lib" \
+"../libcybotUART.lib" \
 "../tm4c123gh6pm.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
@@ -122,29 +137,29 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-CPRE288\ Final\ Project.out \
+Project.out \
 
 EXE_OUTPUTS__QUOTED += \
-"CPRE288 Final Project.out" \
+"Project.out" \
 
 
 # All Target
-all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "CPRE288 Final Project.out"
+all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
+	@$(MAKE) --no-print-directory -Onone "Project.out"
 
 # Tool invocations
-CPRE288\ Final\ Project.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+Project.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"CPRE288 Final Project.map" --heap_size=4096 --stack_size=4096 -i"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="CPRE288 Final Project_linkInfo.xml" --rom_model -o "CPRE288 Final Project.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"Project.map" --heap_size=4096 --stack_size=4096 -i"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Project_linkInfo.xml" --rom_model -o "Project.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "main.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "Timer.obj" "adc.obj" "button.obj" "helloworld.obj" "lab5_template.obj" "lcd.obj" "lcd_rotatingBanner.obj" "main.obj" "movement.obj" "open_interface.obj" "ping_template.obj" "servo.obj" "tm4c123gh6pm_startup_ccs.obj" "uart-interrupt.obj" "uart.obj" 
+	-$(RM) "Timer.d" "adc.d" "button.d" "helloworld.d" "lab5_template.d" "lcd.d" "lcd_rotatingBanner.d" "main.d" "movement.d" "open_interface.d" "ping_template.d" "servo.d" "tm4c123gh6pm_startup_ccs.d" "uart-interrupt.d" "uart.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

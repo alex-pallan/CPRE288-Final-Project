@@ -14,6 +14,8 @@ uint32_t adc_read (void);
 
 uint32_t adc_read_avg (void);
 
+float adc_distance (void);
+
 #endif
 
 

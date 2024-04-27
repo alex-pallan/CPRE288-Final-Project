@@ -1,5 +1,6 @@
 #include <movement.h>
 #include <open_interface.h>
+#include "uart-interrupt.h"
 
 
    // oi_t *sensor_data = oi_alloc(); // do this only once at start of main()
@@ -20,12 +21,17 @@ double  move_forwardF (oi_t  *sensor_data,   double distance_mm){
                 bool turnLeft = sensor_data -> bumpRight;
                 move_backward(sensor_data, 150);
                 sum -= 150;
+                //if bumped object on right
                 if(turnLeft){
+                    uart_sendChar('e');
                     turn_left(sensor_data, 90);
                     move_forward(sensor_data, 250, true);
                     turn_right(sensor_data, 90);
                     return sum;
-                } else {
+                }
+                //if bumped object on left
+                else {
+                    uart_sendChar('q');
                     turn_right(sensor_data, 90);
                     move_forward(sensor_data, 250, true);
                     turn_left(sensor_data, 90);

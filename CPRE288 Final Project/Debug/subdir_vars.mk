@@ -22,6 +22,7 @@ C_SRCS += \
 ../lcd_rotatingBanner.c \
 ../main.c \
 ../movement.c \
+../music.c \
 ../open_interface.c \
 ../ping_template.c \
 ../servo.c \
@@ -39,6 +40,7 @@ C_DEPS += \
 ./lcd_rotatingBanner.d \
 ./main.d \
 ./movement.d \
+./music.d \
 ./open_interface.d \
 ./ping_template.d \
 ./servo.d \
@@ -56,6 +58,7 @@ OBJS += \
 ./lcd_rotatingBanner.obj \
 ./main.obj \
 ./movement.obj \
+./music.obj \
 ./open_interface.obj \
 ./ping_template.obj \
 ./servo.obj \
@@ -73,6 +76,7 @@ OBJS__QUOTED += \
 "lcd_rotatingBanner.obj" \
 "main.obj" \
 "movement.obj" \
+"music.obj" \
 "open_interface.obj" \
 "ping_template.obj" \
 "servo.obj" \
@@ -90,6 +94,7 @@ C_DEPS__QUOTED += \
 "lcd_rotatingBanner.d" \
 "main.d" \
 "movement.d" \
+"music.d" \
 "open_interface.d" \
 "ping_template.d" \
 "servo.d" \
@@ -107,6 +112,7 @@ C_SRCS__QUOTED += \
 "../lcd_rotatingBanner.c" \
 "../main.c" \
 "../movement.c" \
+"../music.c" \
 "../open_interface.c" \
 "../ping_template.c" \
 "../servo.c" \

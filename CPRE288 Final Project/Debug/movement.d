@@ -26,6 +26,7 @@ movement.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h
 movement.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h
 movement.obj: C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/interrupt.h
 movement.obj: U:/CprE288Workspace2/Project/lcd.h
+movement.obj: ../uart-interrupt.h
 
 ../movement.c:
 
@@ -78,4 +79,6 @@ C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h:
 C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/interrupt.h:
 
 U:/CprE288Workspace2/Project/lcd.h:
+
+../uart-interrupt.h:
 

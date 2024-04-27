@@ -19,6 +19,7 @@ ORDERED_OBJS += \
 "./lcd_rotatingBanner.obj" \
 "./main.obj" \
 "./movement.obj" \
+"./music.obj" \
 "./open_interface.obj" \
 "./ping_template.obj" \
 "./servo.obj" \
@@ -158,8 +159,8 @@ Project.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "Timer.obj" "adc.obj" "button.obj" "helloworld.obj" "lab5_template.obj" "lcd.obj" "lcd_rotatingBanner.obj" "main.obj" "movement.obj" "open_interface.obj" "ping_template.obj" "servo.obj" "tm4c123gh6pm_startup_ccs.obj" "uart-interrupt.obj" "uart.obj" 
-	-$(RM) "Timer.d" "adc.d" "button.d" "helloworld.d" "lab5_template.d" "lcd.d" "lcd_rotatingBanner.d" "main.d" "movement.d" "open_interface.d" "ping_template.d" "servo.d" "tm4c123gh6pm_startup_ccs.d" "uart-interrupt.d" "uart.d" 
+	-$(RM) "Timer.obj" "adc.obj" "button.obj" "helloworld.obj" "lab5_template.obj" "lcd.obj" "lcd_rotatingBanner.obj" "main.obj" "movement.obj" "music.obj" "open_interface.obj" "ping_template.obj" "servo.obj" "tm4c123gh6pm_startup_ccs.obj" "uart-interrupt.obj" "uart.obj" 
+	-$(RM) "Timer.d" "adc.d" "button.d" "helloworld.d" "lab5_template.d" "lcd.d" "lcd_rotatingBanner.d" "main.d" "movement.d" "music.d" "open_interface.d" "ping_template.d" "servo.d" "tm4c123gh6pm_startup_ccs.d" "uart-interrupt.d" "uart.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

@@ -34,6 +34,7 @@ main.obj: ../adc.h
 main.obj: ../cyBot_uart.h
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h
 main.obj: ../cyBot_scan.h
+main.obj: ../music.h
 
 ../main.c:
 
@@ -102,4 +103,6 @@ C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_limits.h
 C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h:
 
 ../cyBot_scan.h:
+
+../music.h:
 

@@ -16,6 +16,7 @@
 #include <open_interface.h>
 #include "cyBot_uart.h"
 #include "cyBot_scan.h"
+#include "music.h"
 
 // Uncomment or add any include directives that are needed
 float pingDistance;
@@ -25,7 +26,7 @@ float irDist;
 
 void pingScan(uint32_t degree){
     servo_move(degree);
-    ping_trigger();
+    //ping_trigger();
     pingDistance = ping_getDistance();
     irDist = adc_distance();
 }
@@ -33,17 +34,21 @@ void pingScan(uint32_t degree){
 int scan (int begin, int end){
     //cyBOT_init_Scan(0b111);
 
-   // right_calibration_value = 311500;
+    //right_calibration_value = 311500;
     //left_calibration_value = 1256500;
 
 
    // cyBOT_Scan_t scan;
 
+    servo_init();
+    ping_init();
+    adc_init();
+
    char buffer[25];
    int j;
    int i = 0;
    char header[30];
-   sprintf(header, "Degrees\tPING Distance (cm)\n\r");
+   sprintf(header, "\rDegrees\tPING Distance (cm)\n\r");
    for (j = 0; j < sizeof(header); j++){        //LOOP FOR ALL
        uart_sendChar(header[j]);
    }
@@ -57,26 +62,26 @@ int scan (int begin, int end){
    int stop = end;
    int start = begin;
 
-   pingScan(0);
-   pingScan(0);
+   pingScan(start);
+   pingScan(start);
    for(i = start; i <= stop; i += 2){
        pingScan(i);
        float pingDist = 0;
        int IRVal = 0;
-       for(j = 0; j < 1; j++){
+       for(j = 0; j < 5; j++){
            //Detects an object but ping distance is inaccurate
            IRVal += irDist;
            pingDist += pingDistance;
        }
 
-       IRVal /= 1;
-       pingDist /= 1;
+       IRVal /= 5;
+       pingDist /= 5;
 
        /*if(pingDist > 100 && !measuringObj){
            continue;
        }*/
 
-       if(pingDist < 150){
+       if(IRVal > 850){
            sprintf(buffer, "%d\t\t%f\t%d\n\r", i, pingDist, IRVal);
            for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                uart_sendChar(buffer[j]);
@@ -110,7 +115,7 @@ int scan (int begin, int end){
        uart_sendChar(header[j]);
    }
 
-   int smallestWidth = stop;
+   int smallestWidth = 180;
    int smallestLocation = 90;
 
    for(i = 0; i < objNum; i++){
@@ -122,11 +127,7 @@ int scan (int begin, int end){
        int location = firstAngle[i] + (angularWidth / 2);
        float dist = objDist[i];
        float linearWidth = 2 * 3.14 * dist * (angularWidth / 360.0);
-       if(linearWidth > 2.8 || linearWidth < 3.0){
-           smallestWidth = linearWidth;
-           smallestLocation = location;
-       }
-       else if(linearWidth < smallestWidth){
+       if(linearWidth < smallestWidth){
            smallestWidth = linearWidth;
            smallestLocation = location;
        }
@@ -195,17 +196,15 @@ int main(void){
     button_init();
     timer_init(); // Must be called before lcd_init(), which uses timer functions
     lcd_init();
-    servo_init();
-    ping_init();
     uart_interrupt_init();
-    adc_init();
-
     bool hitTarget = false;
     int i;
     char arr[4];
     int toMove;
     int start;
     char firstArr[4];
+    char buffer[25];
+    int j;
 
     /*INPUTS
         l for rotate left
@@ -225,24 +224,27 @@ int main(void){
             uart_sendChar('S');
             char dir = uart_receive();
             timer_waitMillis(50);
-            uart_sendChar(dir);
+           // uart_sendChar(dir);
+            if(dir != 'm'){
             if(dir == 's'){
+                uart_sendChar('Y');
                 for(i = 0; i < 3; i++){
                     firstArr[i] = uart_receive();
-                    timer_waitMillis(50);
-                    uart_sendChar('A');
+                    //timer_waitMillis(50);
+                    //uart_sendChar('A');
                 }
                 firstArr[3] = '\0';
                 start = atoi(firstArr);
             }
             for(i = 0; i < 3; i++){
                 arr[i] = uart_receive();
-                timer_waitMillis(50);
-                uart_sendChar('A');
+                //timer_waitMillis(50);
+                //uart_sendChar('A');
             }
             arr[3] = '\0';
             toMove = atoi(arr);
             uart_sendChar('X');
+            }
 
                 if(dir == 'f'){
                     int distMoved = move_forwardF(sensor_data, toMove);
@@ -253,10 +255,18 @@ int main(void){
                         uart_sendStr("Hit an Edge\n\r");
                     }
                     else if(distMoved < 100){
-                        uart_sendStr("Hit an Object\n\r");
+                        uart_sendStr("Hit an Object at\t");
+                       /* sprintf(buffer, "%d\n\r", distMoved);
+                        for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+                             uart_sendChar(buffer[j]);
+                        }*/
                     }
                     else{
-                        uart_sendStr("Moved Forward\n\r");
+                        uart_sendStr("Moved Forward\t");
+                        sprintf(buffer, "%d\n\r", distMoved);
+                                   for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+                                       uart_sendChar(buffer[j]);
+                                   }
                     }
                 }
                 else if(dir == 'r'){
@@ -273,7 +283,11 @@ int main(void){
                 }
                 else if(dir == 's'){
                     int target = scan(start, toMove);
-                    hitTarget = move(target, sensor_data);
+                   // moved = move(target, sensor_data);
+                }
+                else if(dir == 'm'){
+                    int num = load_song_SW();
+                    playSong(num);
                 }
         }
         oi_free(sensor_data);

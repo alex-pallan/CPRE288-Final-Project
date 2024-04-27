@@ -10,6 +10,7 @@
 #include "stdlib.h"
 
 unsigned long pwm_period = 0x4E200;
+int lastAngle;
 
 void servo_init (void){
 
@@ -37,9 +38,20 @@ void servo_init (void){
 }
 
 void servo_move(uint16_t degrees){
-    float edgeTime = 1 + (degrees/180.0);
-    int edge = 320000 - (edgeTime * 1000000 / 62.5);
+    int start = degrees;
+    degrees *= 1.9;
+    float edgeTime = (degrees + 100)/180.0;
+    float edge = (pwm_period - (edgeTime *14250));
 
-    TIMER1_TBMATCHR_R = edge; //loaded with match value
-    TIMER1_TBPMR_R = edge >> 16; //timer shifted with prescale
+    TIMER1_TBMATCHR_R = ((int)edge & 0xFFFF);
+    TIMER1_TBPMR_R = (int)edge >> 16;
+    int wait;
+    if(lastAngle == -1){
+        wait = 1000;
+    }
+    else{
+        wait = 200 + ((abs(lastAngle - start)) * 3.2);
+    }
+    timer_waitMillis(wait);
+    lastAngle = start;
 }

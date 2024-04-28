@@ -26,45 +26,35 @@ float irDist;
 
 void pingScan(uint32_t degree){
     servo_move(degree);
-    //ping_trigger();
     pingDistance = ping_getDistance();
     irDist = adc_distance();
+    //uint32_t adcVal = adc_read_avg();
+    //irDist = 689720 * (powf(adcVal, -1.42));
 }
 
-int scan (int begin, int end){
-    //cyBOT_init_Scan(0b111);
-
-    //right_calibration_value = 311500;
-    //left_calibration_value = 1256500;
-
-
-   // cyBOT_Scan_t scan;
-
-    servo_init();
-    ping_init();
-    adc_init();
-
-   char buffer[25];
-   int j;
-   int i = 0;
-   char header[30];
-   sprintf(header, "\rDegrees\tPING Distance (cm)\n\r");
-   for (j = 0; j < sizeof(header); j++){        //LOOP FOR ALL
+int scan (int begin, int end, int pul){
+    char buffer[25];
+    int j;
+    int i = 0;
+    char header[30];
+    sprintf(header, "\rDegrees\tPING Distance (cm)\n\r");
+    for (j = 0; j < sizeof(header); j++){        //LOOP FOR ALL
        uart_sendChar(header[j]);
-   }
+    }
 
-   int firstAngle[10];
-   int lastAngle[10];
-   int firstIR[10];
-   int objNum = 0;
-   float objDist[10];
-   bool measuringObj = false;
-   int stop = end;
-   int start = begin;
+    int firstAngle[10];
+    int lastAngle[10];
+    int firstIR[10];
+    int objNum = 0;
+    float objDist[10];
+    bool measuringObj = false;
+    int pulse = pul;
+    int stop = end;
+    int start = begin;
 
    pingScan(start);
    pingScan(start);
-   for(i = start; i <= stop; i += 2){
+   for(i = start; i <= stop; i += pulse){
        pingScan(i);
        float pingDist = 0;
        int IRVal = 0;
@@ -76,10 +66,6 @@ int scan (int begin, int end){
 
        IRVal /= 5;
        pingDist /= 5;
-
-       /*if(pingDist > 100 && !measuringObj){
-           continue;
-       }*/
 
        if(IRVal > 850){
            sprintf(buffer, "%d\t\t%f\t%d\n\r", i, pingDist, IRVal);
@@ -106,6 +92,14 @@ int scan (int begin, int end){
            //Ignores an object found only at one location, should help eliminate ghost objects
            objNum++;
            measuringObj = false;
+       }
+       int intFloat = (int)pingDist;
+       if(IRVal > 999){
+           IRVal = 999;
+       }
+       sprintf(buffer, "d%d\n\rp%d\n\ri%d\n\r", i, intFloat, IRVal);
+       for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+           uart_sendChar(buffer[j]);
        }
    }
 
@@ -197,16 +191,22 @@ int main(void){
     timer_init(); // Must be called before lcd_init(), which uses timer functions
     lcd_init();
     uart_interrupt_init();
+    servo_init();
+    ping_init();
+    adc_init();
     bool hitTarget = false;
     int i;
     char arr[4];
     int toMove;
     int start;
-    char firstArr[4];
+    char startArr[4];
+    int end;
+    char endArr[4];
+    int pulse;
+    char pulseArr[4];
     char buffer[25];
     int j;
 
-    /* 
      * Note from Alex:
      * Here is the notation that will be used for communication over UART.
      * Each "command" will contain one letter followed by three numbers (Ex. s002, l030, j135, ...).
@@ -228,35 +228,48 @@ int main(void){
      *
      * If the bot thinks it missed part of a command, it can send XXXX and the client will re-send the most recent command
      */
+main(){
 
-        while(!hitTarget){
-            /**sketchy, DRAFT
-             *
-             */
-            uart_sendChar('S');
-            char dir = uart_receive();
-            timer_waitMillis(50);
-           // uart_sendChar(dir);
-            if(dir != 'm'){
-            if(dir == 's'){
-                uart_sendChar('Y');
+    while(!hitTarget){
+        char dir = uart_echo();
+        if(dir != 'm'){
+            if(dir == 'j'){
+                //scan end degree
                 for(i = 0; i < 3; i++){
-                    firstArr[i] = uart_receive();
-                    //timer_waitMillis(50);
-                    //uart_sendChar('A');
+                    endArr[i] = uart_echo();
                 }
-                firstArr[3] = '\0';
-                start = atoi(firstArr);
+                uart_sendChar('\n');
+                endArr[3] = '\0';
+                end = atoi(endArr);
+
+                //scan start degree (dir should be k)
+                dir = uart_echo();
+                for(i = 0; i < 3; i++){
+                    startArr[i] = uart_echo();
+                }
+                uart_sendChar('\n');
+                startArr[3] = '\0';
+                start = atoi(startArr);
+
+                //scan pulse (dir should be s)
+                dir = uart_echo();
+                for(i = 0; i < 3; i++){
+                    pulseArr[i] = uart_echo();
+                }
+                uart_sendChar('\n');
+                pulseArr[3] = '\0';
+                pulse = atoi(pulseArr);
             }
-            for(i = 0; i < 3; i++){
-                arr[i] = uart_receive();
-                //timer_waitMillis(50);
-                //uart_sendChar('A');
-            }
+            //if action isn't scan
+            else{
+                for(i = 0; i < 3; i++){
+                    arr[i] = uart_echo();
+                }
+            uart_sendChar('\n');
             arr[3] = '\0';
             toMove = atoi(arr);
-            uart_sendChar('X');
             }
+        }
 
                 if(dir == 'f'){
                     int distMoved = move_forwardF(sensor_data, toMove);
@@ -266,19 +279,19 @@ int main(void){
                     else if(distMoved < -190){
                         uart_sendStr("Hit an Edge\n\r");
                     }
-                    else if(distMoved < 100){
-                        uart_sendStr("Hit an Object at\t");
-                       /* sprintf(buffer, "%d\n\r", distMoved);
+                    else if(distMoved < toMove){
+                        uart_sendStr("Hit an Object at ");
+                        sprintf(buffer, "%d\n\r", distMoved);
                         for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                              uart_sendChar(buffer[j]);
-                        }*/
+                        }
                     }
                     else{
-                        uart_sendStr("Moved Forward\t");
+                        uart_sendStr("Moved Forward ");
                         sprintf(buffer, "%d\n\r", distMoved);
-                                   for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
-                                       uart_sendChar(buffer[j]);
-                                   }
+                        for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+                           uart_sendChar(buffer[j]);
+                        }
                     }
                 }
                 else if(dir == 'r'){
@@ -294,8 +307,7 @@ int main(void){
                     uart_sendStr("Moved Backward\n\r");
                 }
                 else if(dir == 's'){
-                    int target = scan(start, toMove);
-                   // moved = move(target, sensor_data);
+                    int target = scan(start, end, pulse);
                 }
                 else if(dir == 'm'){
                     int num = load_song_SW();

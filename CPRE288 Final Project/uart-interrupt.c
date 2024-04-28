@@ -115,6 +115,28 @@ char uart_receive(void){
            }
            return data;
 }
+char uart_echo(void){
+    //receive from uart
+    uint32_t ret;
+    char data;
+    while((UART1_FR_R & 0x10) != 0){}
+    ret = UART1_DR_R;
+
+    if(ret & 0xF00){
+      GPIO_PORTB_DATA_R & 0xFF;
+    }else{
+      data = (char)(UART1_DR_R & 0xFF);
+    }
+
+    //send to uart
+    while((UART1_FR_R & 0x20) != 0){};
+              UART1_DR_R = data;
+
+    //return what was sent
+    return data;
+}
+
+
 char uart_receive_nonblocking(void){
     char data;
     while((UART1_FR_R & 0x20) != 0){}

@@ -125,7 +125,7 @@ float ping_getDistance (void){
           dist = timeDiff * 6.25e-8 * 343 * 100/2;
 
           sprintf(message, "Pulse Width: %lu \nDistance: %.4f \n# of Overflows: %i", width, dist, overflow_cnt);
-          lcd_printf(message);
+          //lcd_printf(message);
 
           return dist;
       }

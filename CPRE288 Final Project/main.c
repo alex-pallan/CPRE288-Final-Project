@@ -225,6 +225,8 @@ int main(void){
      * q for bumped left
      * e for bumped right
      * CLIFF SENSOR TBD
+     *
+     * If the bot thinks it missed part of a command, it can send XXXX and the client will re-send the most recent command
      */
 
         while(!hitTarget){

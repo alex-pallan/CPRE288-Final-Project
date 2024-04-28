@@ -209,7 +209,7 @@ int main(void){
     /* 
      * Note from Alex:
      * Here is the notation that will be used for communication over UART.
-     * Each "command" will contain one letter followed by three numbers (Ex. s002, l030, j135), ...).
+     * Each "command" will contain one letter followed by three numbers (Ex. s002, l030, j135, ...).
      *
      * ~ Inputs ~
      * l for rotate left

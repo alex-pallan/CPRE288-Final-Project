@@ -207,7 +207,6 @@ int main(void){
     char buffer[25];
     int j;
 
-    /*
      * Note from Alex:
      * Here is the notation that will be used for communication over UART.
      * Each "command" will contain one letter followed by three numbers (Ex. s002, l030, j135, ...).
@@ -229,6 +228,7 @@ int main(void){
      *
      * If the bot thinks it missed part of a command, it can send XXXX and the client will re-send the most recent command
      */
+main(){
 
     while(!hitTarget){
         char dir = uart_echo();

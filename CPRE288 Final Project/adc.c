@@ -5,6 +5,7 @@
 #include "driverlib/interrupt.h"
 #include <math.h>
 #include "Timer.h"
+#include "lcd.h"
 
 void adc_init(void){
     SYSCTL_RCGCADC_R = 0x1;
@@ -48,10 +49,11 @@ float adc_distance(void){
     uint32_t adcVal = adc_read_avg();
     //BOT 13
     float dist = 689720 * (powf(adcVal, -1.42));
-    //char buffer[20];
-    //sprintf(buffer, "%d, %.2f", adcVal, dist);
-    //lcd_puts(buffer);
-    timer_waitMillis(50);
+    char buffer[20];
+    sprintf(buffer, "%d, %.2f", adcVal, dist);
+    lcd_puts(buffer);
+    timer_waitMillis(100);
+    lcd_clear();
     return dist;
 }
 

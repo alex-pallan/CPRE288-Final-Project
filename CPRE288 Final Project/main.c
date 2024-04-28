@@ -206,16 +206,26 @@ int main(void){
     char buffer[25];
     int j;
 
-    /*INPUTS
-        l for rotate left
-        r for rotate right
-        f for drive forward
-        b for drive backward
-        s for scan
-
-        OUTPUTS
-        q for bumped left
-        e for bumped right*/
+    /* 
+     * Note from Alex:
+     * Here is the notation that will be used for communication over UART.
+     * Each "command" will contain one letter followed by three numbers (Ex. s002, l030, j135), ...).
+     *
+     * ~ Inputs ~
+     * l for rotate left
+     * r for rotate right
+     * f for drive forward
+     * b for drive backward
+     * j to set the left (higher-degree) scan boundary
+     * k to set the right (lower-degree) scan boundary
+     * s to execute the scan (number will be how many degrees between each scan pulse)
+     * m to play music (numbers irrelivent, will be 000)
+     *
+     * ~ Outputs ~
+     * q for bumped left
+     * e for bumped right
+     * CLIFF SENSOR TBD
+     */
 
         while(!hitTarget){
             /**sketchy, DRAFT

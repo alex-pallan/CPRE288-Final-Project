@@ -134,55 +134,6 @@ int scan (int begin, int end, int pul){
    return smallestLocation;
 }
 
-
-bool move (int target, oi_t  *sensor_data){
-    //cyBOT_init_Scan(0b111);
-
-    //right_calibration_value = 311500;
-    //left_calibration_value = 1309000;
-
-    //cyBOT_Scan_t scan;
-
-    int turnAngle = 90 - target;
-    if(turnAngle > 0){
-        turnAngle *= 0.65;
-        lcd_clear();
-        lcd_printf("Right, %d", turnAngle);
-        turn_right(sensor_data, turnAngle);
-    }
-    else{
-        turnAngle *= -0.65;
-        lcd_clear();
-        lcd_printf("Left, %d", turnAngle);
-        turn_left(sensor_data, turnAngle);
-    }
-
-    float targetDistance = 0;
-    int i;
-    timer_waitMillis(1000);
-    pingScan(90);
-    pingScan(90);
-    for(i = 0; i < 5; i++){
-       pingScan(90);
-       while(pingDistance > 150){
-          pingScan(90);
-       }
-       targetDistance += pingDistance;
-       //lcd_clear();
-       //lcd_printf("%d", i);
-    }
-    //Average
-    targetDistance /= 5;
-    //Convert from cm to mm
-    targetDistance *= 10;
-    //Stop just before hitting object
-    targetDistance -= 90;
-
-    float distanceMoved = (float)move_forward(sensor_data, (double)targetDistance, true);
-
-    return (distanceMoved >= targetDistance);
-}
-
 int main(void){
     oi_t *sensor_data = oi_alloc();
     oi_init(sensor_data);
@@ -194,7 +145,7 @@ int main(void){
     servo_init();
     ping_init();
     adc_init();
-    bool hitTarget = false;
+    bool inTarget = false;
     int i;
     char arr[4];
     int toMove;
@@ -207,30 +158,41 @@ int main(void){
     char buffer[25];
     int j;
 
-     * Note from Alex:
+     /* Note from Alex:
      * Here is the notation that will be used for communication over UART.
      * Each "command" will contain one letter followed by three numbers (Ex. s002, l030, j135, ...).
      *
      * ~ Inputs ~
-     * l for rotate left
-     * r for rotate right
-     * f for drive forward
-     * b for drive backward
-     * j to set the left (higher-degree) scan boundary
-     * k to set the right (lower-degree) scan boundary
-     * s to execute the scan (number will be how many degrees between each scan pulse)
+     * l000 for rotate left
+     * r000 for rotate right
+     * f000 for drive forward
+     * b000 for drive backward
+     * j000 to set the left (higher-degree) scan boundary
+     * k000 to set the right (lower-degree) scan boundary
+     * s000 to execute the scan (number will be how many degrees between each scan pulse)
      * m to play music (numbers irrelivent, will be 000)
      *
      * ~ Outputs ~
-     * q for bumped left
-     * e for bumped right
-     * CLIFF SENSOR TBD
+     * l000 for rotate left (approx same as input)
+     * r000 for rotate right (approx same as input)
+     * f000 for drive forward (approx same as input)
+     * b000 for drive backward (approx same as input)
+     * q000 for bumped object on left at distance
+     * e000 for bumped right on right at distance
+     * hf000 for hole in front
+     * hr000 for hole on right
+     * hl000 for hole on left
+     * bf000 for out of bounds in front
+     * br000 for out of bounds on right
+     * bl000 for out of bounds on left
+     * d000 for current degree
+     * p000 for ping distance (cm)
+     * i000 for ir distance (cm)
      *
      * If the bot thinks it missed part of a command, it can send XXXX and the client will re-send the most recent command
      */
-main(){
 
-    while(!hitTarget){
+    while(!inTarget){
         char dir = uart_echo();
         if(dir != 'm'){
             if(dir == 'j'){
@@ -272,22 +234,22 @@ main(){
         }
 
                 if(dir == 'f'){
-                    int distMoved = move_forwardF(sensor_data, toMove);
+                    int distMoved = move_forward(sensor_data, toMove);
                     if(distMoved < -240){
-                        uart_sendStr("Hit a Cliff\n\r");
+                            //do nothing but hit out of bounds (barrier)
                     }
                     else if(distMoved < -190){
-                        uart_sendStr("Hit an Edge\n\r");
+                        //do nothing but hit hole
                     }
+                    //didn't actually move forward since it returned to starting spot
+                    //object is at distMoved from robot
                     else if(distMoved < toMove){
-                        uart_sendStr("Hit an Object at ");
                         sprintf(buffer, "%d\n\r", distMoved);
                         for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                              uart_sendChar(buffer[j]);
                         }
                     }
                     else{
-                        uart_sendStr("Moved Forward ");
                         sprintf(buffer, "%d\n\r", distMoved);
                         for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                            uart_sendChar(buffer[j]);
@@ -295,16 +257,28 @@ main(){
                     }
                 }
                 else if(dir == 'r'){
-                    turn_right(sensor_data, toMove);
-                    uart_sendStr("Turned Right\n\r");
+                    int turned = turn_right(sensor_data, toMove);
+                    uart_sendChar('r');
+                    sprintf(buffer, "%d\n\r", turned);
+                    for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+                       uart_sendChar(buffer[j]);
+                    }
                 }
                 else if(dir == 'l'){
-                    turn_left(sensor_data, toMove);
-                    uart_sendStr("Turned Left\n\r");
+                    int turned = turn_left(sensor_data, toMove);
+                    uart_sendChar('l');
+                    sprintf(buffer, "%d\n\r", turned);
+                    for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+                       uart_sendChar(buffer[j]);
+                    }
                 }
                 else if(dir == 'b'){
-                    move_backward(sensor_data, toMove);
-                    uart_sendStr("Moved Backward\n\r");
+                    int distMoved = move_backward(sensor_data, toMove);
+                    uart_sendChar('b');
+                    sprintf(buffer, "%d\n\r", distMoved);
+                    for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+                       uart_sendChar(buffer[j]);
+                    }
                 }
                 else if(dir == 's'){
                     int target = scan(start, end, pulse);
@@ -312,6 +286,7 @@ main(){
                 else if(dir == 'm'){
                     int num = load_song_SW();
                     playSong(num);
+                    uart_sendChar('m');
                 }
         }
         oi_free(sensor_data);

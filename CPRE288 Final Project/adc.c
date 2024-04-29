@@ -51,8 +51,8 @@ float adc_distance(void){
     float dist = 689720 * (powf(adcVal, -1.42));
     char buffer[20];
     sprintf(buffer, "%d, %.2f", adcVal, dist);
-    lcd_puts(buffer);
-    timer_waitMillis(100);
+    //lcd_puts(buffer);
+    timer_waitMillis(50);
     lcd_clear();
     return dist;
 }

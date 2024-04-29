@@ -52,6 +52,6 @@ void servo_move(uint16_t degrees){
     else{
         wait = 200 + ((abs(lastAngle - start)) * 3.2);
     }
-    timer_waitMillis(wait);
+    timer_waitMillis(50);
     lastAngle = start;
 }

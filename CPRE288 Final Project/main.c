@@ -32,22 +32,10 @@ void pingScan(uint32_t degree){
     //irDist = 689720 * (powf(adcVal, -1.42));
 }
 
-int scan (int begin, int end, int pul){
-    char buffer[25];
+void scan (int begin, int end, int pul){
+    char buffer[3];
     int j;
     int i = 0;
-    char header[30];
-    sprintf(header, "\rDegrees\tPING Distance (cm)\n\r");
-    for (j = 0; j < sizeof(header); j++){        //LOOP FOR ALL
-       uart_sendChar(header[j]);
-    }
-
-    int firstAngle[10];
-    int lastAngle[10];
-    int firstIR[10];
-    int objNum = 0;
-    float objDist[10];
-    bool measuringObj = false;
     int pulse = pul;
     int stop = end;
     int start = begin;
@@ -67,71 +55,31 @@ int scan (int begin, int end, int pul){
        IRVal /= 5;
        pingDist /= 5;
 
-       if(IRVal > 850){
-           sprintf(buffer, "%d\t\t%f\t%d\n\r", i, pingDist, IRVal);
-           for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
-               uart_sendChar(buffer[j]);
-           }
-           if(!measuringObj){
-               firstAngle[objNum] = i;
-               objDist[objNum] = pingDist;
-               measuringObj = true;
-           }
-           else{
-               if(IRVal < firstIR[objNum] - 150){
-                   lastAngle[objNum] = i - 2;
-                   //Ignores an object found only at one location, should help eliminate ghost objects
-                   objNum++;
-
-                   measuringObj = false;
-               }
-           }
-       }
-       else if(measuringObj){
-           lastAngle[objNum] = i - 2;
-           //Ignores an object found only at one location, should help eliminate ghost objects
-           objNum++;
-           measuringObj = false;
-       }
-       int intFloat = (int)pingDist;
+       //int intFloat = (int)pingDist;
        if(IRVal > 999){
            IRVal = 999;
        }
-       sprintf(buffer, "d%d\n\rp%d\n\ri%d\n\r", i, intFloat, IRVal);
+       uart_sendChar('d');
+       sprintf(buffer, "%d", i);
+       for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+           uart_sendChar(buffer[j]);
+        }
+       uart_sendChar('\n');
+
+       uart_sendChar('p');
+       sprintf(buffer, "%.0f", pingDist);
        for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
            uart_sendChar(buffer[j]);
        }
+       uart_sendChar('\n');
+
+       uart_sendChar('i');
+        sprintf(buffer, "%d", IRVal);
+        for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
+          uart_sendChar(buffer[j]);
+        }
+        uart_sendChar('\n');
    }
-
-   //print stats
-   sprintf(header, "Obj#\tAngle\tDistance\tWidth\n\r");
-   for (j = 0; j < sizeof(header); j++){        //LOOP FOR ALL
-       uart_sendChar(header[j]);
-   }
-
-   int smallestWidth = 180;
-   int smallestLocation = 90;
-
-   for(i = 0; i < objNum; i++){
-       int angularWidth = lastAngle[i] - firstAngle[i];
-       //Ignores an object found only at one location, should help eliminate ghost objects
-       if(angularWidth <= 2){
-           continue;
-       }
-       int location = firstAngle[i] + (angularWidth / 2);
-       float dist = objDist[i];
-       float linearWidth = 2 * 3.14 * dist * (angularWidth / 360.0);
-       if(linearWidth < smallestWidth){
-           smallestWidth = linearWidth;
-           smallestLocation = location;
-       }
-       sprintf(buffer, "%d\t%d\t%.3f\t%d\t%.3f\n\r", i, location, dist, angularWidth, linearWidth);
-       for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
-           uart_sendChar(buffer[j]);
-       }
-   }
-
-   return smallestLocation;
 }
 
 int main(void){
@@ -155,7 +103,7 @@ int main(void){
     char endArr[4];
     int pulse;
     char pulseArr[4];
-    char buffer[25];
+    char buffer[3];
     int j;
 
      /* Note from Alex:
@@ -194,7 +142,7 @@ int main(void){
 
     while(!inTarget){
         char dir = uart_echo();
-        if(dir != 'm'){
+        if(dir != 'u' && dir != 'm'){
             if(dir == 'j'){
                 //scan end degree
                 for(i = 0; i < 3; i++){
@@ -234,7 +182,7 @@ int main(void){
         }
 
                 if(dir == 'f'){
-                    int distMoved = move_forward(sensor_data, toMove);
+                    double distMoved = move_forward(sensor_data, toMove);
                     if(distMoved < -240){
                             //do nothing but hit out of bounds (barrier)
                     }
@@ -244,44 +192,52 @@ int main(void){
                     //didn't actually move forward since it returned to starting spot
                     //object is at distMoved from robot
                     else if(distMoved < toMove){
-                        sprintf(buffer, "%d\n\r", distMoved);
+                        sprintf(buffer, "%.0f", distMoved);
                         for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                              uart_sendChar(buffer[j]);
                         }
+                        uart_sendChar('\n');
                     }
                     else{
-                        sprintf(buffer, "%d\n\r", distMoved);
+                        sprintf(buffer, "%.0f", distMoved);
                         for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                            uart_sendChar(buffer[j]);
                         }
+                        uart_sendChar('\n');
                     }
                 }
                 else if(dir == 'r'){
-                    int turned = turn_right(sensor_data, toMove);
+                    double turned = turn_right(sensor_data, toMove);
                     uart_sendChar('r');
-                    sprintf(buffer, "%d\n\r", turned);
+                    sprintf(buffer, "%.0f", turned);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                        uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                 }
                 else if(dir == 'l'){
-                    int turned = turn_left(sensor_data, toMove);
+                    double turned = turn_left(sensor_data, toMove);
                     uart_sendChar('l');
-                    sprintf(buffer, "%d\n\r", turned);
+                    sprintf(buffer, "%.0f", turned);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                        uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                 }
                 else if(dir == 'b'){
-                    int distMoved = move_backward(sensor_data, toMove);
+                    double distMoved = move_backward(sensor_data, toMove);
                     uart_sendChar('b');
-                    sprintf(buffer, "%d\n\r", distMoved);
+                    sprintf(buffer, "%.0f", distMoved);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                        uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                 }
                 else if(dir == 's'){
-                    int target = scan(start, end, pulse);
+                    scan(start, end, pulse);
+                }
+                else if(dir == 'u'){
+                    scan(0, 180, 2);
                 }
                 else if(dir == 'm'){
                     int num = load_song_SW();

@@ -10,7 +10,7 @@
 
 double  move_forward (oi_t  *sensor_data,   double distance_mm){
 
-    char buffer[25];
+    char buffer[3];
     int j;
         double sum = 0;
         oi_setWheels(100,100);
@@ -43,73 +43,79 @@ double  move_forward (oi_t  *sensor_data,   double distance_mm){
 
                 if(frontL > 2700 || frontR > 2700){
                     move_backward(sensor_data, sum);
-                    uart_sendChar('h');
+                    uart_sendChar('b');
                     uart_sendChar('f');
-                    int newSum = (int)sum;
-                    sprintf(buffer, "%d\n\r", newSum);
+                    //int newSum = (int)sum;
+                    sprintf(buffer, "%.0f", sum);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                          uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                     return -200;
                 }
 
                 else if(right > 2700){
                     move_backward(sensor_data, sum);
-                    uart_sendChar('h');
+                    uart_sendChar('b');
                     uart_sendChar('r');
-                    int newSum = (int)sum;
-                    sprintf(buffer, "%d\n\r", newSum);
+                    //int newSum = (int)sum;
+                    sprintf(buffer, "%.0f", sum);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                          uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                     return -200;
                 }
 
                 else if(left > 2700){
                     move_backward(sensor_data, sum);
-                    uart_sendChar('h');
+                    uart_sendChar('b');
                     uart_sendChar('l');
-                    int newSum = (int)sum;
-                    sprintf(buffer, "%d\n\r", newSum);
+                    //int newSum = (int)sum;
+                    sprintf(buffer, "%.0f", sum);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                          uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                     return -200;
                 }
 
                 else if(frontL < 500 || frontR < 500){
                     move_backward(sensor_data, sum);
-                    uart_sendChar('b');
+                    uart_sendChar('h');
                     uart_sendChar('f');
-                    int newSum = (int)sum;
-                    sprintf(buffer, "%d\n\r", newSum);
+                    //int newSum = (int)sum;
+                    sprintf(buffer, "%.0f", sum);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                          uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                     return -250;
                 }
 
                 else if(right < 500){
                     move_backward(sensor_data, sum);
-                    uart_sendChar('b');
+                    uart_sendChar('h');
                     uart_sendChar('r');
-                    int newSum = (int)sum;
-                    sprintf(buffer, "%d\n\r", newSum);
+                    //int newSum = (int)sum;
+                    sprintf(buffer, "%.0f", sum);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                          uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                     return -250;
                 }
 
                 else if(left < 500){
                     move_backward(sensor_data, sum);
-                    uart_sendChar('b');
+                    uart_sendChar('h');
                     uart_sendChar('l');
-                    int newSum = (int)sum;
-                    sprintf(buffer, "%d\n\r", newSum);
+                    //int newSum = (int)sum;
+                    sprintf(buffer, "%.0f", sum);
                     for (j = 0; j < sizeof(buffer); j++){        //LOOP FOR ALL
                          uart_sendChar(buffer[j]);
                     }
+                    uart_sendChar('\n');
                     return -250;
                 }
             }
